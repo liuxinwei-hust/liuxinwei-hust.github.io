@@ -4,6 +4,89 @@
   
   
   <entry>
+    <title>C++随机数</title>
+    <link href="/2024/03/28/C-%E9%9A%8F%E6%9C%BA%E6%95%B0/"/>
+    <url>/2024/03/28/C-%E9%9A%8F%E6%9C%BA%E6%95%B0/</url>
+    
+    <content type="html"><![CDATA[<h1 id="真随机"><a href="#真随机" class="headerlink" title="真随机"></a>真随机</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;random&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><br><span class="hljs-type">uint32_t</span> num = std::random_device&#123;&#125;();<br></code></pre></td></tr></table></figure><h1 id="伪随机"><a href="#伪随机" class="headerlink" title="伪随机"></a>伪随机</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;random&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-comment">// 获取32位随机值</span><br><span class="hljs-function"><span class="hljs-type">static</span> std::mt19937 <span class="hljs-title">rand_gen_32</span><span class="hljs-params">(std::random_device&#123;&#125;())</span></span>;<br><span class="hljs-type">uint32_t</span> num = <span class="hljs-built_in">rand_gen_32</span>();<br><br><span class="hljs-comment">// 获取64位随机值</span><br><span class="hljs-function"><span class="hljs-type">static</span> std::mt19937_64 <span class="hljs-title">rand_gen_64</span><span class="hljs-params">(std::random_device&#123;&#125;())</span></span>;<br><span class="hljs-type">uint64_t</span> num = <span class="hljs-built_in">rand_gen_64</span>();<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++代码库</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>随机数</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>C++字符串切割</title>
+    <link href="/2024/03/28/C-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%87%E5%89%B2/"/>
+    <url>/2024/03/28/C-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%87%E5%89%B2/</url>
+    
+    <content type="html"><![CDATA[<h1 id="字符串切割"><a href="#字符串切割" class="headerlink" title="字符串切割"></a>字符串切割</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">StringUtils::SplitString</span><span class="hljs-params">(<span class="hljs-type">const</span> std::string&amp; source, <span class="hljs-type">const</span> std::string&amp; delimiter, std::vector&lt;std::string&gt;&amp; vec)</span> </span>&#123;<br>  <span class="hljs-type">size_t</span> last = <span class="hljs-number">0</span>;<br>  <span class="hljs-type">size_t</span> index = source.<span class="hljs-built_in">find_first_of</span>(delimiter);<br>  <span class="hljs-keyword">while</span> (index != std::string::npos) &#123;<br>    vec.<span class="hljs-built_in">push_back</span>(source.<span class="hljs-built_in">substr</span>(last, index - last));<br>    last = index + <span class="hljs-number">1</span>;<br>    index = source.<span class="hljs-built_in">find_first_of</span>(delimiter, last);<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (std::string::npos == index) &#123;<br>    std::string strTmp = source.<span class="hljs-built_in">substr</span>(last, source.<span class="hljs-built_in">length</span>() - last);<br>    <span class="hljs-keyword">if</span> (!strTmp.<span class="hljs-built_in">empty</span>()) &#123;<br>      vec.<span class="hljs-built_in">push_back</span>(strTmp);<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure><h1 id="字符串切割并删除空格"><a href="#字符串切割并删除空格" class="headerlink" title="字符串切割并删除空格"></a>字符串切割并删除空格</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">StringUtils::SplitStringWithTrim</span><span class="hljs-params">(<span class="hljs-type">const</span> std::string&amp; source,</span></span><br><span class="hljs-params"><span class="hljs-function">                                      <span class="hljs-type">const</span> std::string&amp; delimiter,</span></span><br><span class="hljs-params"><span class="hljs-function">                                      std::vector&lt;std::string&gt;&amp; vec)</span> </span>&#123;<br>  <span class="hljs-type">size_t</span> last = <span class="hljs-number">0</span>;<br>  <span class="hljs-type">size_t</span> index = source.<span class="hljs-built_in">find_first_of</span>(delimiter);<br>  <span class="hljs-keyword">while</span> (index != std::string::npos) &#123;<br>    std::string strTmp = source.<span class="hljs-built_in">substr</span>(last, index - last);<br>    vec.<span class="hljs-built_in">push_back</span>(<span class="hljs-built_in">trim</span>(strTmp));<br>    last = index + <span class="hljs-number">1</span>;<br>    index = source.<span class="hljs-built_in">find_first_of</span>(delimiter, last);<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (std::string::npos == index) &#123;<br>    std::string strTmp = source.<span class="hljs-built_in">substr</span>(last, source.<span class="hljs-built_in">length</span>() - last);<br>    <span class="hljs-keyword">if</span> (!strTmp.<span class="hljs-built_in">empty</span>()) &#123;<br>      vec.<span class="hljs-built_in">push_back</span>(<span class="hljs-built_in">trim</span>(strTmp));<br>    &#125;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// trim from begin</span><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> std::string&amp; <span class="hljs-title">ltrim</span><span class="hljs-params">(std::string&amp; s)</span> </span>&#123;<br>    s.<span class="hljs-built_in">erase</span>(s.<span class="hljs-built_in">begin</span>(), std::<span class="hljs-built_in">find_if</span>(s.<span class="hljs-built_in">begin</span>(), s.<span class="hljs-built_in">end</span>(), std::<span class="hljs-built_in">not1</span>(std::<span class="hljs-built_in">ptr_fun</span>&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;(std::isspace))));<br>    <span class="hljs-keyword">return</span> s;<br>&#125;<br><br><span class="hljs-comment">// trim from end</span><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> std::string&amp; <span class="hljs-title">rtrim</span><span class="hljs-params">(std::string&amp; s)</span> </span>&#123;<br>    s.<span class="hljs-built_in">erase</span>(std::<span class="hljs-built_in">find_if</span>(s.<span class="hljs-built_in">rbegin</span>(), s.<span class="hljs-built_in">rend</span>(), std::<span class="hljs-built_in">not1</span>(std::<span class="hljs-built_in">ptr_fun</span>&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;(std::isspace))).<span class="hljs-built_in">base</span>(), s.<span class="hljs-built_in">end</span>());<br>    <span class="hljs-keyword">return</span> s;<br>&#125;<br><br><span class="hljs-comment">// trim from both ends</span><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> std::string&amp; <span class="hljs-title">trim</span><span class="hljs-params">(std::string&amp; s)</span> </span>&#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">ltrim</span>(<span class="hljs-built_in">rtrim</span>(s)); &#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++代码库</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>字符串切割</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>C++获取当前时间</title>
+    <link href="/2024/03/28/C-%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%97%B6%E9%97%B4/"/>
+    <url>/2024/03/28/C-%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%97%B6%E9%97%B4/</url>
+    
+    <content type="html"><![CDATA[<h1 id="通过gettimeofday获取"><a href="#通过gettimeofday获取" class="headerlink" title="通过gettimeofday获取"></a>通过gettimeofday获取</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/time.h&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">int64_t</span> <span class="hljs-title">GetCurrentMilliseconds</span><span class="hljs-params">()</span> </span>&#123;<br>  timeval now;<br>  <span class="hljs-built_in">gettimeofday</span>(&amp;now, <span class="hljs-literal">NULL</span>);<br>  <span class="hljs-keyword">return</span> now.tv_sec * (<span class="hljs-type">int64_t</span>)<span class="hljs-number">1000</span> + now.tv_usec / (<span class="hljs-type">int64_t</span>)<span class="hljs-number">1000</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">int64_t</span> <span class="hljs-title">GetCurrentMicroseconds</span><span class="hljs-params">()</span> </span>&#123;<br>  timeval now;<br>  <span class="hljs-built_in">gettimeofday</span>(&amp;now, <span class="hljs-literal">NULL</span>);<br>  <span class="hljs-keyword">return</span> now.tv_sec * (<span class="hljs-type">int64_t</span>)<span class="hljs-number">1000000</span> + now.tv_usec;<br>&#125;<br></code></pre></td></tr></table></figure><h1 id="通过std-chrono库获取"><a href="#通过std-chrono库获取" class="headerlink" title="通过std::chrono库获取"></a>通过std::chrono库获取</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-function"><span class="hljs-type">int64_t</span> <span class="hljs-title">TimeUtils::GetCurrentMilliSeconds</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-keyword">auto</span> current_time = std::chrono::system_clock::<span class="hljs-built_in">now</span>().<span class="hljs-built_in">time_since_epoch</span>();<br>  <span class="hljs-keyword">return</span> std::chrono::<span class="hljs-built_in">duration_cast</span>&lt;std::chrono::milliseconds&gt;(current_time).<span class="hljs-built_in">count</span>();<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int64_t</span> <span class="hljs-title">TimeUtils::GetCurrentMicroseconds</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-keyword">auto</span> current_time = std::chrono::system_clock::<span class="hljs-built_in">now</span>().<span class="hljs-built_in">time_since_epoch</span>();<br>  <span class="hljs-keyword">return</span> std::chrono::<span class="hljs-built_in">duration_cast</span>&lt;std::chrono::microseconds&gt;(current_time).<span class="hljs-built_in">count</span>();<br>&#125;<br><br><span class="hljs-function">std::string <span class="hljs-title">TimeUtils::ToDateString</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> timestamp_ms)</span> </span>&#123;<br>  std::<span class="hljs-type">time_t</span> timestamp = timestamp_ms;<br>  std::stringstream string_stream;<br>  string_stream &lt;&lt; std::<span class="hljs-built_in">put_time</span>(std::<span class="hljs-built_in">localtime</span>(&amp;timestamp), <span class="hljs-string">&quot;%Y-%m-%d&quot;</span>);<br>  <span class="hljs-keyword">return</span> string_stream.<span class="hljs-built_in">str</span>();<br>&#125;<br><br><span class="hljs-function">std::string <span class="hljs-title">TimeUtils::ToDatetimeString</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> timestamp_ms)</span> </span>&#123;<br>  std::<span class="hljs-type">time_t</span> timestamp = timestamp_ms;<br>  std::stringstream string_stream;<br>  string_stream &lt;&lt; std::<span class="hljs-built_in">put_time</span>(std::<span class="hljs-built_in">localtime</span>(&amp;timestamp), <span class="hljs-string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>);<br>  <span class="hljs-keyword">return</span> string_stream.<span class="hljs-built_in">str</span>();<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++代码库</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>gettimeofday</tag>
+      
+      <tag>chrono</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>C++令牌桶</title>
     <link href="/2024/03/27/C-%E4%BB%A4%E7%89%8C%E6%A1%B6/"/>
     <url>/2024/03/27/C-%E4%BB%A4%E7%89%8C%E6%A1%B6/</url>
@@ -31,44 +114,6 @@
       <tag>压测</tag>
       
     </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>test</title>
-    <link href="/2024/03/26/test/"/>
-    <url>/2024/03/26/test/</url>
-    
-    <content type="html"><![CDATA[<p>test page </p><p><img src="/2024/03/26/test/1.png" alt="图片引用"></p>]]></content>
-    
-    
-    <categories>
-      
-      <category>C++</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>原创</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="/2024/03/26/hello-world/"/>
-    <url>/2024/03/26/hello-world/</url>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
-    
-    
     
   </entry>
   
