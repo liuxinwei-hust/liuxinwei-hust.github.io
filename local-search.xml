@@ -4,6 +4,37 @@
   
   
   <entry>
+    <title>Perf采集</title>
+    <link href="/2024/03/29/Perf%E9%87%87%E9%9B%86/"/>
+    <url>/2024/03/29/Perf%E9%87%87%E9%9B%86/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Perf"><a href="#Perf" class="headerlink" title="Perf"></a>Perf</h1><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs ada">perf <span class="hljs-keyword">record</span> -e cpu-clock -g -p <span class="hljs-number">2548</span><br><br>-g 选项是告诉perf <span class="hljs-keyword">record</span>额外记录函数的调用关系<br><br>-e cpu-clock 指perf <span class="hljs-keyword">record</span>监控的指标为cpu周期<br><br>-p 指定需要<span class="hljs-keyword">record</span>的进程pid<br></code></pre></td></tr></table></figure><p>程序运行完之后，perf record会生成一个名为perf.data的文件，如果之前已有，那么之前的perf.data文件会被覆盖</p><p>获得这个perf.data文件之后，就需要perf report工具进行查看</p><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">perf</span> re<span class="hljs-keyword">port</span> -i perf.data<br></code></pre></td></tr></table></figure><h1 id="使用火焰图展示结果"><a href="#使用火焰图展示结果" class="headerlink" title="使用火焰图展示结果"></a>使用火焰图展示结果</h1><p>Flame Graph项目位于GitHub上：git clone <a href="https://github.com/brendangregg/FlameGraph">https://github.com/brendangregg/FlameGraph</a></p><p>以perf为例，看一下flamegraph的使用方法：</p><ul><li><p>第一步</p><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">perf <span class="hljs-keyword">record</span> -e cpu-clock -g -p <span class="hljs-number">28591</span><br></code></pre></td></tr></table></figure><p>Ctrl+c结束执行后，在当前目录下会生成采样数据perf.data.</p></li><li><p>第二步</p></li></ul><p>用perf script工具对perf.data进行解析</p><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs haskell"><span class="hljs-title">perf</span> script -i perf.<span class="hljs-class"><span class="hljs-keyword">data</span> &amp;&gt; perf.unfold</span><br></code></pre></td></tr></table></figure><ul><li>第三步</li></ul><p>将perf.unfold中的符号进行折叠：</p><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">./stackcollapse-perf<span class="hljs-selector-class">.pl</span> perf<span class="hljs-selector-class">.unfold</span> &amp;&gt; perf.folded<br></code></pre></td></tr></table></figure><ul><li>最后生成svg图：<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">./flamegraph<span class="hljs-selector-class">.pl</span> perf<span class="hljs-selector-class">.folded</span> &gt; perf.svg<br></code></pre></td></tr></table></figure></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++代码库</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>压测</tag>
+      
+      <tag>perf</tag>
+      
+      <tag>性能采集</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>硬盘分区备份</title>
     <link href="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/"/>
     <url>/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/</url>
