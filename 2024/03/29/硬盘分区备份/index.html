@@ -28,13 +28,13 @@
 <meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/3.png">
 <meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/4.png">
 <meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/5.png">
-<meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/6.png">
+<meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/6.jpg">
 <meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/7.png">
 <meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/8.png">
 <meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/9.png">
-<meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/10.png">
+<meta property="og:image" content="http://example.com/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/10.jpg">
 <meta property="article:published_time" content="2024-03-29T01:29:02.000Z">
-<meta property="article:modified_time" content="2024-03-29T02:18:43.903Z">
+<meta property="article:modified_time" content="2024-03-29T02:25:41.248Z">
 <meta property="article:author" content="Liu XinWei">
 <meta property="article:tag" content="原创">
 <meta property="article:tag" content="C++">
@@ -374,7 +374,7 @@
 </tr>
 </tbody></table>
 <p>MBR有四个分区表，四个分区表中可以用来全部描述主分区，或最多只能有一个用来描述扩展分区，其他三个描述主分区。当描述扩展分区时，则分区表的文件系统标志位为0x0F，此分区表描述了一个链表，链表的每个节点称作虚拟MBR，他与MBR有相同的结构，虚拟MBR的分区表1描述了一个逻辑分区，而分区表2指向了下一个节点，其他分区表为空。当虚拟MBR的分区表2为0，则表示链表结束，因此扩展分区中可以分为很多个逻辑分区。</p>
-<p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/6.png" srcset="/img/loading.gif" lazyload alt="扩展分区"></p>
+<p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/6.jpg" srcset="/img/loading.gif" lazyload alt="扩展分区"></p>
 <h1 id="DBR"><a href="#DBR" class="headerlink" title="DBR"></a>DBR</h1><p>DBR全称为Driver Boot Record，俗称分区引导扇区。在DBR中包含分区引导程序、分区信息记录，比如文件$MFT起始簇、跳转代码、OEM、结束标志等信息。下图为DBR扇区数据：<br>DBR 扇区总共有五部分数据组成，即</p>
 <ol>
 <li>跳转程序，共占3B；</li>
@@ -395,14 +395,14 @@
 <p>[1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 0 1 1 1 1        ]  </p>
 <p>对于位图中这些连续的1，即连续使用的扇区可以一次读取多个扇区，而不是一个扇区一个扇区读取，减少读取次数。</p>
 <p>将分区读取后按如下的的格式写入文件，即可得到分区的镜像文件:</p>
-<p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/10.png" srcset="/img/loading.gif" lazyload alt="镜像文件"></p>
+<p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/10.jpg" srcset="/img/loading.gif" lazyload alt="镜像文件"></p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
 <li>读取MBR，找到要备份的分区表</li>
 <li>如果是主分区直接定位到起始扇区</li>
 <li>如果是扩展分区，还要通过拉链指针定位到扩展分区的起始扇区</li>
 <li>通过DBR找到元数据$MFT的位置</li>
-<li>寻找分区Bitmap，记录了哪些分区被占用</li>
-<li>将分区读取后按如下的的格式写入镜像文件</li>
+<li>寻找分区Bitmap，记录了哪些扇区被占用</li>
+<li>将扇区读取后按如下的的格式写入镜像文件</li>
 </ol>
 <p>还原则使用相反的方式</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/liuxinwei-hust/disk_backup">github virtual studio工程</a></p>
