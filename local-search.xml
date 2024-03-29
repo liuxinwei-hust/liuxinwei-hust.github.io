@@ -4,6 +4,45 @@
   
   
   <entry>
+    <title>硬盘分区备份</title>
+    <link href="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/"/>
+    <url>/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/</url>
+    
+    <content type="html"><![CDATA[<h1 id="文件拷贝VS扇区拷贝"><a href="#文件拷贝VS扇区拷贝" class="headerlink" title="文件拷贝VS扇区拷贝"></a>文件拷贝VS扇区拷贝</h1><p>当更换硬盘进行数据备份时，最简单的搞法是Ctrl+C Ctrl+V，但还有种更快的备份方式，即物理备份，直接读硬盘扇区，将硬盘中用到的扇区全部备份，本文即介绍如何通过扇区将分区备份成文件<br><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/1.png" alt="扇区备份180MB/s"></p><h1 id="硬盘介绍"><a href="#硬盘介绍" class="headerlink" title="硬盘介绍"></a>硬盘介绍</h1><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/2.png" alt="硬盘结构"></p><p>一个硬盘一般有多个盘片，盘片越多存储容量越大，结构如图，这里记录些知识点：</p><ol><li>盘片正反两面都可读写,磁头数是盘片数两倍</li><li>扇区是按顺序编号的，并且是外磁道向内磁道编号，因为外磁道更快，相同大小的数据，外磁道转半圈，内磁道可能需要转1圈</li><li>每次读取的数据可能在不同磁道，换道时延大概10ms， 顺序读取时延和转速相关，换多个磁道是用电梯算法</li><li>磁道与磁道之间有一定的隔离带，防止数据覆盖，但也有磁盘，为提高容量天然互相覆盖，即瓦记录磁盘，但速度慢</li><li>并口比串口快吗，不会，老的磁盘用的并口并不快</li></ol><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/3.png" alt="并口ATA"><br>ATA高级技术附件（ Advanced Technology Attachment ）硬盘一般使用IDE接口，分为PATA硬盘（即parallelATA,并行ATA硬盘接口规范）和SATA硬盘（即serialATA，串行ATA硬盘接口规范).</p><ol><li>串行ATA的时钟频率要比并行的时钟频率高很多 </li><li>抗干扰能力强</li><li>连线更简单，节省成本，你是愿意插16根网线还是一根</li></ol><h1 id="MBR"><a href="#MBR" class="headerlink" title="MBR"></a>MBR</h1><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/4.png" alt="MBR"></p><p>当系统开机或者重启，BIOS 加电自检 ( Power On Self Test – POST )，BIOS执行内存地址为 FFFF:0000H 处的跳转指令，跳转到固化在ROM中的自检程序处，对系统硬件(包括内存)进行检查。接着，读取主引导记录(MBR)。BIOS将相应启动设备的第一个扇区(也就是MBR扇区)读入内存地址为0000:7C00H 处。检查0000:7CFEH-0000:7CFFH(MBR的结束标志位)是否等于55AAH，若不等于则转去尝试其他启动设备，如果没有启动设备满足要求则显示”NO ROM BASIC”然后死机，如果发现磁盘中不存在活动分区，则显示类似如下的信息“Remove disk or other media Press any key to restart”</p><h1 id="分区表"><a href="#分区表" class="headerlink" title="分区表"></a>分区表</h1><p>MBR中的分区表<br><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/5.png" alt="分区表"></p><ul><li>CHS:<br>CHS寻址模式使用的是磁柱号（CYLINDER）、磁头号（HEAD）、扇区号（SECTOR）这三个值来寻址，也就是使用以上分区表结构中的01H，02H处的值来确定分区的起始位置，使用05H和06H处的值来确定分区的结束位置。CHS寻址模式中，磁头数用 8 个二进制位存储, 最大为 256 ;柱面数用10个二进制位存储, 最大为 1024; 扇区数用6个二进制位存储，最大为63 。每个扇区一般是 512个字节。所以磁盘最大容量为: 256 * 1024 * 63 * 512 &#x2F; 1048576 &#x3D; 8064 MB ( 1M &#x3D; 1048576 Bytes)或硬盘厂商常用的单位:256 * 1024 * 63 * 512 &#x2F; 1000000 &#x3D; 8455 MB ( 1M &#x3D; 1000000 Bytes )。在 CHS 寻址方式中, 磁头, 柱面, 扇区的取值范围分别为 0 到 Heads-1,0 到 Cylinders-1, 1 到 Sectors per track (注意是从 1 开始)。因此，CHS寻址的最大空间为8G左右。</li><li>LBA：<br>对于现代大于8.4G的硬盘，CHS已经无法表示, BIOS使用LBA寻址模式，对于超出的部分，CHS的值通常设为 FEFFFF, 并加以忽略，直接使用08H-0FH的8字节相对值来确定分区的起始位置。因此，现在的分区的寻址模式大部分都是使用LBA来寻址，LBA的一个地址使用4个字节来表示，最大为232*512&#x3D;2TB。对于大于2TB的硬盘，如果要完全利用硬盘将使用GTP分区</li></ul><h1 id="扩展分区"><a href="#扩展分区" class="headerlink" title="扩展分区"></a>扩展分区</h1><p>分区中的文件系统类型表：</p><table><thead><tr><th>十六进制值</th><th>意义</th></tr></thead><tbody><tr><td>00h</td><td>未用</td></tr><tr><td>01h</td><td>FAT12</td></tr><tr><td>04h</td><td>FAT16（CHS寻址模式，分区大小最大为32MB）</td></tr><tr><td>05h</td><td>扩展分区（CHS寻址模式）</td></tr><tr><td>06h</td><td>FAT16（CHS寻址模式，分区大小大于32MB）</td></tr><tr><td>07h</td><td>NTFS</td></tr><tr><td>0BH</td><td>FAT32(CHS寻址模式)</td></tr><tr><td>0CH</td><td>FAT32（LBA寻址模式）</td></tr><tr><td>0EH</td><td>FAT15（LBA寻址模式）</td></tr><tr><td>0FH</td><td>扩展分区（LBA寻址模式）</td></tr></tbody></table><p>MBR有四个分区表，四个分区表中可以用来全部描述主分区，或最多只能有一个用来描述扩展分区，其他三个描述主分区。当描述扩展分区时，则分区表的文件系统标志位为0x0F，此分区表描述了一个链表，链表的每个节点称作虚拟MBR，他与MBR有相同的结构，虚拟MBR的分区表1描述了一个逻辑分区，而分区表2指向了下一个节点，其他分区表为空。当虚拟MBR的分区表2为0，则表示链表结束，因此扩展分区中可以分为很多个逻辑分区。</p><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/6.png" alt="扩展分区"></p><h1 id="DBR"><a href="#DBR" class="headerlink" title="DBR"></a>DBR</h1><p>DBR全称为Driver Boot Record，俗称分区引导扇区。在DBR中包含分区引导程序、分区信息记录，比如文件$MFT起始簇、跳转代码、OEM、结束标志等信息。下图为DBR扇区数据：<br>DBR 扇区总共有五部分数据组成，即</p><ol><li>跳转程序，共占3B；</li><li>OEM代号，共占8B；</li><li>BPB数据，共占73B；</li><li>引导程序，共占426B；</li><li>结束标志，数值为 55 AA，占用2B。</li></ol><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/7.png" alt="DBR"></p><h1 id="NTFS文件系统bitmap"><a href="#NTFS文件系统bitmap" class="headerlink" title="NTFS文件系统bitmap"></a>NTFS文件系统bitmap</h1><p><a href="https://blog.51cto.com/dengqi/1351300">NTFS文件系统详细介绍</a><br>只是备份的话，实际不需要了解那么清楚，只需要知道文件系统的位图信息即可知道，哪些扇区被使用了，只用备份这些扇区，$MFT的前16个文件记录总是元文件的，并且顺序是固定不变的</p><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/8.png" alt="NTFS"></p><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/9.png" alt="找Bitmap"></p><ol><li>定位DBR，通过DBR可以得知$MFT的起始簇号及簇的大小。</li><li>定位$MFT，找到$MFT的后，在其中寻找Bitmap的文件记录，在6号文件记录。</li></ol><h1 id="镜像文件"><a href="#镜像文件" class="headerlink" title="镜像文件"></a>镜像文件</h1><p>读取分区的技巧： </p><p>[1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 0 1 1 1 1        ]  </p><p>对于位图中这些连续的1，即连续使用的扇区可以一次读取多个扇区，而不是一个扇区一个扇区读取，减少读取次数。</p><p>将分区读取后按如下的的格式写入文件，即可得到分区的镜像文件:</p><p><img src="/2024/03/29/%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E5%A4%87%E4%BB%BD/10.png" alt="镜像文件"></p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol><li>读取MBR，找到要备份的分区表</li><li>如果是主分区直接定位到起始扇区</li><li>如果是扩展分区，还要通过拉链指针定位到扩展分区的起始扇区</li><li>通过DBR找到元数据$MFT的位置</li><li>寻找分区Bitmap，记录了哪些分区被占用</li><li>将分区读取后按如下的的格式写入镜像文件</li></ol><p>还原则使用相反的方式</p><p><a href="https://github.com/liuxinwei-hust/disk_backup">github virtual studio工程</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>存储</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>原创</tag>
+      
+      <tag>C++</tag>
+      
+      <tag>MBR</tag>
+      
+      <tag>DBR</tag>
+      
+      <tag>0号扇区</tag>
+      
+      <tag>分区表</tag>
+      
+      <tag>分区备份</tag>
+      
+      <tag>NTFS文件系统</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>C++随机数</title>
     <link href="/2024/03/28/C-%E9%9A%8F%E6%9C%BA%E6%95%B0/"/>
     <url>/2024/03/28/C-%E9%9A%8F%E6%9C%BA%E6%95%B0/</url>
