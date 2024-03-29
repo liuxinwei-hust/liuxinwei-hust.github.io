@@ -4,6 +4,37 @@
   
   
   <entry>
+    <title>go性能</title>
+    <link href="/2024/03/29/go%E6%80%A7%E8%83%BD/"/>
+    <url>/2024/03/29/go%E6%80%A7%E8%83%BD/</url>
+    
+    <content type="html"><![CDATA[<h1 id="pprof"><a href="#pprof" class="headerlink" title="pprof"></a>pprof</h1><p>Go 语言自带的 pprof 库就可以分析程序的运行情况，并且提供可视化的功能。可以通过报告生成、Web 可视化界面、交互式终端三种方式来使用 pprof。它包含两个相关的库：</p><ul><li>runtime&#x2F;pprof对于只跑一次的程序，调用 pprof 包提供的函数，手动开启性能数据采集。</li><li>net&#x2F;http&#x2F;pprof对于持续运行的在线服务，访问 pprof 提供的 HTTP 接口，获得性能数据。<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs Go"><span class="hljs-keyword">import</span> (<br>    <span class="hljs-string">&quot;net/http&quot;</span><br>    _ <span class="hljs-string">&quot;net/http/pprof&quot;</span><br>)<br><br><span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>    http.ListenAndServe(<span class="hljs-string">&quot;127.0.0.1:6060&quot;</span>, <span class="hljs-literal">nil</span>)<br>&#125;()<br><br></code></pre></td></tr></table></figure></li></ul><p>下载 cpu profile，默认从当前开始收集 30s 的 cpu 使用情况，</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Go"><span class="hljs-keyword">go</span> tool pprof http:<span class="hljs-comment">//127.0.0.1:6060/debug/pprof/profile?seconds=30</span><br></code></pre></td></tr></table></figure><p>等待30s生成cpu的报告文件，pprof.tdrAgent.samples.cpu，并默认进入终端交互模式</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Go"><span class="hljs-keyword">go</span> tool pprof -http=<span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">32000</span> pprof.tdrAgent.samples.cpu<span class="hljs-number">.002</span>.pb.gz<br></code></pre></td></tr></table></figure><p>对生成的报告启动web接口可视化，生成调用堆栈的火焰图，火焰图的每个函数均可点击，查看更深层的堆栈和cpu占用百分比</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>GO代码库</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>压测</tag>
+      
+      <tag>性能采集</tag>
+      
+      <tag>Go</tag>
+      
+      <tag>pprof</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Perf采集</title>
     <link href="/2024/03/29/Perf%E9%87%87%E9%9B%86/"/>
     <url>/2024/03/29/Perf%E9%87%87%E9%9B%86/</url>
