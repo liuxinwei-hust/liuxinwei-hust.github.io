@@ -1,0 +1,718 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Liu XinWei">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="性能数据一般统计后端数据库的性能指标有最大时延，平均时延，但还有个更重要的指标即P99时延，99%的用户落在哪个时延区间 123456789Latency    Number of requests1s         52s         53s         104s         405s         206s         157s         48s         1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="p99时延统计">
+<meta property="og:url" content="http://example.com/2024/04/03/p99%E6%97%B6%E5%BB%B6%E7%BB%9F%E8%AE%A1/index.html">
+<meta property="og:site_name" content="AI&#39;s Time">
+<meta property="og:description" content="性能数据一般统计后端数据库的性能指标有最大时延，平均时延，但还有个更重要的指标即P99时延，99%的用户落在哪个时延区间 123456789Latency    Number of requests1s         52s         53s         104s         405s         206s         157s         48s         1">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-04-03T01:40:35.000Z">
+<meta property="article:modified_time" content="2024-04-03T02:12:20.000Z">
+<meta property="article:author" content="Liu XinWei">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="压测">
+<meta property="article:tag" content="P99时延计算">
+<meta property="article:tag" content="性能">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>p99时延统计 - AI&#39;s Time</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Liu&#39;s个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于我</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/doc.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="p99时延统计"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-04-03 09:40" pubdate>
+          2024年4月3日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">p99时延统计</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="性能数据"><a href="#性能数据" class="headerlink" title="性能数据"></a>性能数据</h1><p>一般统计后端数据库的性能指标有最大时延，平均时延，但还有个更重要的指标即P99时延，99%的用户落在哪个时延区间</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Latency</span>    Number of requests<br><span class="hljs-attribute">1s</span>         <span class="hljs-number">5</span><br><span class="hljs-attribute">2s</span>         <span class="hljs-number">5</span><br><span class="hljs-attribute">3s</span>         <span class="hljs-number">10</span><br><span class="hljs-attribute">4s</span>         <span class="hljs-number">40</span><br><span class="hljs-attribute">5s</span>         <span class="hljs-number">20</span><br><span class="hljs-attribute">6s</span>         <span class="hljs-number">15</span><br><span class="hljs-attribute">7s</span>         <span class="hljs-number">4</span><br><span class="hljs-attribute">8s</span>         <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<p>比如100个请求，第99个请求落在了7s这个区间,那么p99就是7秒,而不是前99个请求的平均时延</p>
+<h1 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h1><ul>
+<li>对时间划分区间，统计落在每个区间的请求数，和总时延</li>
+<li>每秒根据请求总数计算第99%的请求落在哪个时延区间</li>
+<li>计算时延区间的平均时延</li>
+</ul>
+<p>比如，数据库的大部分时延在毫秒级，如此划分时延区间</p>
+<ul>
+<li>时延 [0-20ms)的1ms一个桶，总共20个桶</li>
+<li>时延 [20ms-200ms)的时候10ms一个桶，总共18个桶</li>
+<li>时延 [200ms-1000ms)50ms一个桶，总共16个桶</li>
+<li>时延 [1000ms+) 总共一个桶</li>
+</ul>
+<p>某个请求的时延落在哪个桶类，则该桶中的请求总数++，时延总数++ （下章节的SetP99Delay函数）;每秒根据请求总数的99%,落在哪个时延区间,计算时延区间的平均时延（下章节的GetP99Delay函数）</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>某监控统计实现，计算p99和获取p99关注函数</p>
+<ul>
+<li>SetP99Delay</li>
+<li>GetP99Delay</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-comment">// .h头文件</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BUCKET_20MS_SIZE 20    <span class="hljs-comment">// [0-20ms)的1ms一个桶</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BUCKET_200MS_SIZE 18   <span class="hljs-comment">// [20ms-200ms)的时候10ms一个桶</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BUCKET_1000MS_SIZE 16  <span class="hljs-comment">// [200ms-1000ms)50ms一个桶</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> BUCKET_OTHER_SIZE 1    <span class="hljs-comment">// [1000ms+) 一个桶</span></span><br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Bucket</span> &#123;<br>  <span class="hljs-type">int64_t</span> totalDelay;<br>  <span class="hljs-type">int64_t</span> count;<br>&#125;;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Monitor</span> &#123;<br> <span class="hljs-keyword">public</span>:<br>  <span class="hljs-built_in">Monitor</span>();<br>  ~<span class="hljs-built_in">Monitor</span>();<br>  <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">Init</span><span class="hljs-params">(std::string cmd)</span></span>;<br><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">IncSendErrCount</span><span class="hljs-params">()</span> </span>&#123;<br>    m_sendCount++;<br>    m_sendErrCount++;<br><br>    m_sendSumCount++;<br>    m_sendErrSumCount++;<br>  &#125;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">IncSendSuccCount</span><span class="hljs-params">()</span> </span>&#123;<br>    m_sendCount++;<br><br>    m_sendSumCount++;<br>  &#125;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">IncRecvErrCount</span><span class="hljs-params">()</span> </span>&#123;<br>    m_recvErrCount++;<br>    m_recvCount++;<br><br>    m_recvSumCount++;<br>    m_recvErrSumCount++;<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">IncRecvSuccCount</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> delay)</span> </span>&#123;<br>    m_recvCount++;<br>    m_recvSumCount++;<br>    <span class="hljs-keyword">if</span> (delay &lt; <span class="hljs-number">0</span>) &#123;<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    m_totalDelay += delay;<br>    m_delayCount++;<br>    m_totalSumDelay += delay;<br>    m_delaySumCount++;<br>    <span class="hljs-keyword">if</span> (m_maxDelay &lt; delay) &#123;<br>      m_maxDelay = delay;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (m_maxSumDelay &lt; delay) &#123;<br>      m_maxSumDelay = delay;<br>    &#125;<br>    <span class="hljs-built_in">SetP99Delay</span>(delay);<br>  &#125;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Print</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> curTimeMs)</span></span>;<br><br> <span class="hljs-keyword">private</span>:<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Reset</span><span class="hljs-params">()</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">SetP99Delay</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> delay)</span></span>;<br>  <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">GetP99Delay</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> &amp;p99Delay, <span class="hljs-type">int64_t</span> &amp;p999Delay, <span class="hljs-type">int64_t</span> &amp;p9999Delay)</span></span>;<br><br> <span class="hljs-keyword">private</span>:<br>  <span class="hljs-comment">// period</span><br>  std::string m_cmd;<br>  <span class="hljs-type">int64_t</span> m_sendCount;<br>  <span class="hljs-type">int64_t</span> m_sendErrCount;<br>  <span class="hljs-type">int64_t</span> m_recvCount;<br>  <span class="hljs-type">int64_t</span> m_recvErrCount;<br>  <span class="hljs-type">int64_t</span> m_delayCount;<br>  <span class="hljs-type">int64_t</span> m_totalDelay;  <span class="hljs-comment">// us</span><br>  <span class="hljs-type">int64_t</span> m_maxDelay;    <span class="hljs-comment">// us</span><br><br>  <span class="hljs-comment">// sum</span><br>  <span class="hljs-type">int64_t</span> m_sendSumCount;<br>  <span class="hljs-type">int64_t</span> m_sendErrSumCount;<br>  <span class="hljs-type">int64_t</span> m_recvSumCount;<br>  <span class="hljs-type">int64_t</span> m_recvErrSumCount;<br>  <span class="hljs-type">int64_t</span> m_delaySumCount;<br>  <span class="hljs-type">int64_t</span> m_totalSumDelay;  <span class="hljs-comment">// us</span><br>  <span class="hljs-type">int64_t</span> m_maxSumDelay;    <span class="hljs-comment">// us</span><br><br>  <span class="hljs-comment">// P99计算，越小越精确</span><br>  <span class="hljs-comment">// [0-20ms)的1ms一个桶，[20ms-200ms)的时候10ms一个桶</span><br>  <span class="hljs-comment">// [200ms-1000ms)50ms一个桶，[1000ms+)单独一个桶</span><br>  Bucket m_20MSBucket[BUCKET_20MS_SIZE];<br>  <span class="hljs-type">int64_t</span> m_20MSTotalRecvCount;<br>  Bucket m_200MSBucket[BUCKET_200MS_SIZE];<br>  <span class="hljs-type">int64_t</span> m_200MSTotalRecvCount;<br>  Bucket m_1000MSBucket[BUCKET_1000MS_SIZE];<br>  <span class="hljs-type">int64_t</span> m_1000MSTotalRecvCount;<br>  Bucket m_otherBucket;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-comment">// .cpp文件</span><br>Monitor::<span class="hljs-built_in">Monitor</span>() &#123;<br>  m_sendSumCount = <span class="hljs-number">0</span>;<br>  m_sendErrSumCount = <span class="hljs-number">0</span>;<br>  m_recvSumCount = <span class="hljs-number">0</span>;<br>  m_recvErrSumCount = <span class="hljs-number">0</span>;<br>  m_delaySumCount = <span class="hljs-number">0</span>;<br>  m_totalSumDelay = <span class="hljs-number">0</span>;<br>  m_maxSumDelay = <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">Reset</span>();<br>&#125;<br><br>Monitor::~<span class="hljs-built_in">Monitor</span>() &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">Monitor::Init</span><span class="hljs-params">(std::string cmd)</span> </span>&#123;<br>  m_cmd = cmd;<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Monitor::Reset</span><span class="hljs-params">()</span> </span>&#123;<br>  m_sendCount = <span class="hljs-number">0</span>;<br>  m_sendErrCount = <span class="hljs-number">0</span>;<br>  m_recvCount = <span class="hljs-number">0</span>;<br>  m_recvErrCount = <span class="hljs-number">0</span>;<br>  m_delayCount = <span class="hljs-number">0</span>;<br>  m_totalDelay = <span class="hljs-number">0</span>;<br>  m_maxDelay = <span class="hljs-number">0</span>;<br><br>  <span class="hljs-built_in">memset</span>(m_20MSBucket, <span class="hljs-number">0</span>, <span class="hljs-built_in">sizeof</span>(m_20MSBucket));<br>  m_20MSTotalRecvCount = <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">memset</span>(m_200MSBucket, <span class="hljs-number">0</span>, <span class="hljs-built_in">sizeof</span>(m_200MSBucket));<br>  m_200MSTotalRecvCount = <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">memset</span>(m_1000MSBucket, <span class="hljs-number">0</span>, <span class="hljs-built_in">sizeof</span>(m_1000MSBucket));<br>  m_1000MSTotalRecvCount = <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">memset</span>(&amp;m_otherBucket, <span class="hljs-number">0</span>, <span class="hljs-built_in">sizeof</span>(m_otherBucket));<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Monitor::SetP99Delay</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> delay)</span> </span>&#123;<br>  <span class="hljs-keyword">if</span> (delay &lt; <span class="hljs-number">20000LL</span>) &#123;<br>    <span class="hljs-comment">// [0-20ms)的1ms一个桶</span><br>    m_20MSBucket[delay / <span class="hljs-number">1000LL</span>].count++;<br>    m_20MSBucket[delay / <span class="hljs-number">1000LL</span>].totalDelay += delay;<br>    m_20MSTotalRecvCount++;<br>  &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (delay &lt; <span class="hljs-number">200000LL</span>) &#123;<br>    <span class="hljs-comment">// [20ms-200ms)的时候10ms一个桶</span><br>    m_200MSBucket[(delay - <span class="hljs-number">20000LL</span>) / <span class="hljs-number">10000LL</span>].count++;<br>    m_200MSBucket[(delay - <span class="hljs-number">20000LL</span>) / <span class="hljs-number">10000LL</span>].totalDelay += delay;<br>    m_200MSTotalRecvCount++;<br>  &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (delay &lt; <span class="hljs-number">1000000LL</span>) &#123;<br>    <span class="hljs-comment">// [200ms-1000ms)50ms一个桶</span><br>    m_1000MSBucket[(delay - <span class="hljs-number">200000LL</span>) / <span class="hljs-number">50000LL</span>].count++;<br>    m_1000MSBucket[(delay - <span class="hljs-number">200000LL</span>) / <span class="hljs-number">50000LL</span>].totalDelay += delay;<br>    m_1000MSTotalRecvCount++;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    m_otherBucket.count++;<br>    m_otherBucket.totalDelay += delay;<br>  &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Monitor::GetP99Delay</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> &amp;p99Delay, <span class="hljs-type">int64_t</span> &amp;p999Delay, <span class="hljs-type">int64_t</span> &amp;p9999Delay)</span> </span>&#123;<br>  p99Delay = <span class="hljs-number">0</span>;<br>  p999Delay = <span class="hljs-number">0</span>;<br>  p9999Delay = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">if</span> (m_delayCount &lt;= <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-keyword">return</span>;<br>  &#125;<br><br>  <span class="hljs-type">int64_t</span> p99Count = m_delayCount * <span class="hljs-number">99</span> / <span class="hljs-number">100</span>;<br>  <span class="hljs-type">int64_t</span> p999Count = m_delayCount * <span class="hljs-number">999</span> / <span class="hljs-number">1000</span>;<br>  <span class="hljs-type">int64_t</span> p9999Count = m_delayCount * <span class="hljs-number">9999</span> / <span class="hljs-number">10000</span>;<br>  <span class="hljs-built_in">DEBUG_LOG</span>(BenchmarkLogger::<span class="hljs-built_in">GetInstance</span>()-&gt;<span class="hljs-built_in">GetMonitorLogger</span>(),<br>            <span class="hljs-string">&quot;p99Count:&#123;&#125; p999Count:&#123;&#125;  p9999Count:&#123;&#125; m_20MSTotalRecvCount:&#123;&#125; m_200MSTotalRecvCount:&#123;&#125; &quot;</span><br>            <span class="hljs-string">&quot;m_1000MSTotalRecvCount:&#123;&#125;, m_otherBucket:&#123;&#125;&quot;</span>,<br>            p99Count,<br>            p999Count,<br>            p9999Count,<br>            m_20MSTotalRecvCount,<br>            m_200MSTotalRecvCount,<br>            m_1000MSTotalRecvCount,<br>            m_otherBucket.count);<br>  <span class="hljs-keyword">if</span> (m_20MSTotalRecvCount &gt; <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-comment">// find [0-20ms)的1ms一个桶 m_20MSBucket</span><br>    <span class="hljs-type">int</span> total = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">int</span> pos = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (pos = <span class="hljs-number">0</span>; pos &lt; BUCKET_20MS_SIZE; pos++) &#123;<br>      <span class="hljs-keyword">if</span> (m_20MSBucket[pos].count &lt;= <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">continue</span>;<br>      &#125;<br>      total += m_20MSBucket[pos].count;<br>      <span class="hljs-comment">// p99</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p99Count &amp;&amp; p99Delay == <span class="hljs-number">0</span>) &#123;<br>        p99Delay = m_20MSBucket[pos].totalDelay / m_20MSBucket[pos].count;<br>        <span class="hljs-keyword">if</span> (m_20MSTotalRecvCount &lt; p999Count) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-comment">// p999</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p999Count &amp;&amp; p999Delay == <span class="hljs-number">0</span>) &#123;<br>        p999Delay = m_20MSBucket[pos].totalDelay / m_20MSBucket[pos].count;<br>        <span class="hljs-keyword">if</span> (m_20MSTotalRecvCount &lt; p9999Count) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-comment">// p9999</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p9999Count &amp;&amp; p9999Delay == <span class="hljs-number">0</span>) &#123;<br>        p9999Delay = m_20MSBucket[pos].totalDelay / m_20MSBucket[pos].count;<br>        <span class="hljs-built_in">INFO_LOG</span>(BenchmarkLogger::<span class="hljs-built_in">GetInstance</span>()-&gt;<span class="hljs-built_in">GetMonitorLogger</span>(),<br>                 <span class="hljs-string">&quot;total:&#123;&#125; pos:&#123;&#125; totalDelay:&#123;&#125; count:&#123;&#125; p99Delay:&#123;&#125; p999Delay:&#123;&#125; p9999Delay:&#123;&#125;&quot;</span>,<br>                 total,<br>                 pos,<br>                 m_20MSBucket[pos].totalDelay,<br>                 m_20MSBucket[pos].count,<br>                 p99Delay,<br>                 p999Delay,<br>                 p9999Delay);<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (m_200MSTotalRecvCount &gt; <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-comment">// find [20ms-200ms)的时候10ms一个桶 m_200MSBucket</span><br>    <span class="hljs-type">int</span> total = m_20MSTotalRecvCount;<br>    <span class="hljs-type">int</span> pos = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (pos = <span class="hljs-number">0</span>; pos &lt; BUCKET_200MS_SIZE; pos++) &#123;<br>      <span class="hljs-keyword">if</span> (m_200MSBucket[pos].count &lt;= <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">continue</span>;<br>      &#125;<br>      total += m_200MSBucket[pos].count;<br><br>      <span class="hljs-comment">// p99</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p99Count &amp;&amp; p99Delay == <span class="hljs-number">0</span>) &#123;<br>        p99Delay = m_200MSBucket[pos].totalDelay / m_200MSBucket[pos].count;<br>        <span class="hljs-keyword">if</span> (m_20MSTotalRecvCount + m_200MSTotalRecvCount &lt; p999Count) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-comment">// p999</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p999Count &amp;&amp; p999Delay == <span class="hljs-number">0</span>) &#123;<br>        p999Delay = m_200MSBucket[pos].totalDelay / m_200MSBucket[pos].count;<br>        <span class="hljs-keyword">if</span> (m_20MSTotalRecvCount + m_200MSTotalRecvCount &lt; p9999Count) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-comment">// p9999</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p9999Count &amp;&amp; p9999Delay == <span class="hljs-number">0</span>) &#123;<br>        p9999Delay = m_200MSBucket[pos].totalDelay / m_200MSBucket[pos].count;<br>        <span class="hljs-built_in">INFO_LOG</span>(BenchmarkLogger::<span class="hljs-built_in">GetInstance</span>()-&gt;<span class="hljs-built_in">GetMonitorLogger</span>(),<br>                 <span class="hljs-string">&quot;total:&#123;&#125; pos:&#123;&#125; totalDelay:&#123;&#125; count:&#123;&#125; p99Delay:&#123;&#125; p999Delay:&#123;&#125; p9999Delay:&#123;&#125;&quot;</span>,<br>                 total,<br>                 pos,<br>                 m_20MSBucket[pos].totalDelay,<br>                 m_20MSBucket[pos].count,<br>                 p99Delay,<br>                 p999Delay,<br>                 p9999Delay);<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (m_1000MSTotalRecvCount &gt; <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-comment">// find [200ms-1000ms)50ms一个桶 m_1000MSBucket</span><br>    <span class="hljs-type">int</span> total = m_20MSTotalRecvCount + m_200MSTotalRecvCount;<br>    <span class="hljs-type">int</span> pos = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (pos = <span class="hljs-number">0</span>; pos &lt; BUCKET_1000MS_SIZE; pos++) &#123;<br>      <span class="hljs-keyword">if</span> (m_1000MSBucket[pos].count &lt;= <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">continue</span>;<br>      &#125;<br>      total += m_1000MSBucket[pos].count;<br><br>      <span class="hljs-comment">// p99</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p99Count &amp;&amp; p99Delay == <span class="hljs-number">0</span>) &#123;<br>        p99Delay = m_1000MSBucket[pos].totalDelay / m_1000MSBucket[pos].count;<br>        <span class="hljs-keyword">if</span> (m_20MSTotalRecvCount + m_200MSTotalRecvCount + m_1000MSTotalRecvCount &lt; p999Count) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-comment">// p999</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p999Count &amp;&amp; p999Delay == <span class="hljs-number">0</span>) &#123;<br>        p999Delay = m_1000MSBucket[pos].totalDelay / m_1000MSBucket[pos].count;<br>        <span class="hljs-keyword">if</span> (m_20MSTotalRecvCount + m_200MSTotalRecvCount + m_1000MSTotalRecvCount &lt; p9999Count) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-comment">// p9999</span><br>      <span class="hljs-keyword">if</span> (total &gt;= p9999Count &amp;&amp; p9999Delay == <span class="hljs-number">0</span>) &#123;<br>        p9999Delay = m_1000MSBucket[pos].totalDelay / m_1000MSBucket[pos].count;<br>        <span class="hljs-built_in">INFO_LOG</span>(BenchmarkLogger::<span class="hljs-built_in">GetInstance</span>()-&gt;<span class="hljs-built_in">GetMonitorLogger</span>(),<br>                 <span class="hljs-string">&quot;total:&#123;&#125; pos:&#123;&#125; totalDelay:&#123;&#125; count:&#123;&#125; p99Delay:&#123;&#125; p999Delay:&#123;&#125; p9999Delay:&#123;&#125;&quot;</span>,<br>                 total,<br>                 pos,<br>                 m_20MSBucket[pos].totalDelay,<br>                 m_20MSBucket[pos].count,<br>                 p99Delay,<br>                 p999Delay,<br>                 p9999Delay);<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (m_otherBucket.count &gt; <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-type">int64_t</span> otherAvgDelay = m_otherBucket.totalDelay / m_otherBucket.count;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> == p99Delay) &#123;<br>      p99Delay = otherAvgDelay;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> == p999Delay) &#123;<br>      p999Delay = otherAvgDelay;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-number">0</span> == p9999Delay) &#123;<br>      p9999Delay = otherAvgDelay;<br>    &#125;<br>  &#125;<br>  <span class="hljs-built_in">DEBUG_LOG</span>(BenchmarkLogger::<span class="hljs-built_in">GetInstance</span>()-&gt;<span class="hljs-built_in">GetMonitorLogger</span>(), <span class="hljs-string">&quot;p9999Delay:&#123;&#125;&quot;</span>, p9999Delay);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Monitor::Print</span><span class="hljs-params">(<span class="hljs-type">int64_t</span> curTimeMs)</span> </span>&#123;<br>  <span class="hljs-comment">// 计算</span><br>  <span class="hljs-type">int64_t</span> qps = m_sendCount - m_sendErrCount;<br>  <span class="hljs-type">int64_t</span> avgDelay = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">if</span> (m_delayCount &gt; <span class="hljs-number">0</span>) &#123;<br>    avgDelay = m_totalDelay / m_delayCount;<br>  &#125;<br>  <span class="hljs-type">int64_t</span> p99Delay = <span class="hljs-number">0</span>;<br>  <span class="hljs-type">int64_t</span> p999Delay = <span class="hljs-number">0</span>;<br>  <span class="hljs-type">int64_t</span> p9999Delay = <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">GetP99Delay</span>(p99Delay, p999Delay, p9999Delay);<br><br>  <span class="hljs-keyword">if</span> (m_cmd.<span class="hljs-built_in">empty</span>()) &#123;<br>    <span class="hljs-comment">// total</span><br>    <span class="hljs-type">time_t</span> now = curTimeMs / <span class="hljs-number">1000</span>;<br>    tm *ltm = <span class="hljs-built_in">localtime</span>(&amp;now);<br>    <span class="hljs-built_in">printf</span>(<br>        <span class="hljs-string">&quot;&#123;\&quot;time\&quot;:\&quot;%d-%.2d-%.2d %.2d:%.2d:%.2d\&quot;,\&quot;qps\&quot;:%ld, &quot;</span><br>        <span class="hljs-string">&quot;\&quot;request_count\&quot;:%ld,\&quot;success_count\&quot;:%ld,\&quot;failed_count\&quot;:%ld,\&quot;average_delay\&quot;:\&quot;%ld.%ldms\&quot;,&quot;</span><br>        <span class="hljs-string">&quot;\&quot;maximum_delay\&quot;:\&quot;%ld.%ldms\&quot;,\&quot;p99_delay\&quot;:\&quot;%ld.%ldms\&quot;,\&quot;p999_delay\&quot;:\&quot;%ld.%ldms\&quot;,\&quot;p9999_&quot;</span><br>        <span class="hljs-string">&quot;delay\&quot;:\&quot;%ld.%ldms\&quot;,\&quot;metrics_by_command\&quot;:[&quot;</span>,<br>        <span class="hljs-number">1900</span> + ltm-&gt;tm_year,<br>        <span class="hljs-number">1</span> + ltm-&gt;tm_mon,<br>        ltm-&gt;tm_mday,<br>        ltm-&gt;tm_hour,<br>        ltm-&gt;tm_min,<br>        ltm-&gt;tm_sec,<br>        qps,<br>        qps,<br>        (m_recvCount - m_recvErrCount),<br>        (m_recvErrCount + m_sendErrCount),<br>        avgDelay / <span class="hljs-number">1000</span>,<br>        avgDelay % <span class="hljs-number">1000</span>,<br>        m_maxDelay / <span class="hljs-number">1000</span>,<br>        m_maxDelay % <span class="hljs-number">1000</span>,<br>        p99Delay / <span class="hljs-number">1000</span>,<br>        p99Delay % <span class="hljs-number">1000</span>,<br>        p999Delay / <span class="hljs-number">1000</span>,<br>        p999Delay % <span class="hljs-number">1000</span>,<br>        p9999Delay / <span class="hljs-number">1000</span>,<br>        p9999Delay % <span class="hljs-number">1000</span>);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-built_in">INFO_LOG</span>(BenchmarkLogger::<span class="hljs-built_in">GetInstance</span>()-&gt;<span class="hljs-built_in">GetMonitorLogger</span>(),<br>             <span class="hljs-string">&quot;QPS:&#123;&#125; CMD:&#123;&#125; SendSucc:&#123;&#125; SendErr:&#123;&#125; Recv:&#123;&#125; RecvErr:&#123;&#125; AvgDelay:&#123;&#125;us MaxDelay:&#123;&#125;us &quot;</span><br>             <span class="hljs-string">&quot;P99Delay:&#123;&#125;us P999Delay:&#123;&#125;us P9999Delay:&#123;&#125;us&quot;</span>,<br>             qps,<br>             m_cmd.<span class="hljs-built_in">c_str</span>(),<br>             qps,<br>             m_sendErrCount,<br>             (m_recvCount - m_recvErrCount),<br>             m_recvErrCount,<br>             avgDelay,<br>             m_maxDelay,<br>             p99Delay,<br>             p999Delay,<br>             p9999Delay);<br>    <span class="hljs-built_in">printf</span>(<br>        <span class="hljs-string">&quot;&#123;\&quot;command\&quot;:\&quot;%s\&quot;,\&quot;qps\&quot;:%ld, &quot;</span><br>        <span class="hljs-string">&quot;\&quot;request_count\&quot;:%ld,\&quot;success_count\&quot;:%ld,\&quot;failed_count\&quot;:%ld,\&quot;average_delay\&quot;:\&quot;%ld.%ldms\&quot;,&quot;</span><br>        <span class="hljs-string">&quot;\&quot;maximum_delay\&quot;:\&quot;%ld.%ldms\&quot;,\&quot;p99_delay\&quot;:\&quot;%ld.%ldms\&quot;,\&quot;p999_delay\&quot;:\&quot;%ld.%ldms\&quot;,\&quot;p9999_&quot;</span><br>        <span class="hljs-string">&quot;delay\&quot;:\&quot;%ld.%ldms\&quot;&#125;&quot;</span>,<br>        m_cmd.<span class="hljs-built_in">c_str</span>(),<br>        qps,<br>        qps,<br>        (m_recvCount - m_recvErrCount),<br>        (m_recvErrCount + m_sendErrCount),<br>        avgDelay / <span class="hljs-number">1000</span>,<br>        avgDelay % <span class="hljs-number">1000</span>,<br>        m_maxDelay / <span class="hljs-number">1000</span>,<br>        m_maxDelay % <span class="hljs-number">1000</span>,<br>        p99Delay / <span class="hljs-number">1000</span>,<br>        p99Delay % <span class="hljs-number">1000</span>,<br>        p999Delay / <span class="hljs-number">1000</span>,<br>        p999Delay % <span class="hljs-number">1000</span>,<br>        p9999Delay / <span class="hljs-number">1000</span>,<br>        p9999Delay % <span class="hljs-number">1000</span>);<br>  &#125;<br>  <span class="hljs-built_in">Reset</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C-%E4%BB%A3%E7%A0%81%E5%BA%93/" class="category-chain-item">C++代码库</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C/" class="print-no-link">#C++</a>
+      
+        <a href="/tags/%E5%8E%8B%E6%B5%8B/" class="print-no-link">#压测</a>
+      
+        <a href="/tags/P99%E6%97%B6%E5%BB%B6%E8%AE%A1%E7%AE%97/" class="print-no-link">#P99时延计算</a>
+      
+        <a href="/tags/%E6%80%A7%E8%83%BD/" class="print-no-link">#性能</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>p99时延统计</div>
+      <div>http://example.com/2024/04/03/p99时延统计/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Liu XinWei</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年4月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/29/go%E6%80%A7%E8%83%BD/" title="go性能">
+                        <span class="hidden-mobile">go性能</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'liuxinwei-hust/comment-utterance');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
