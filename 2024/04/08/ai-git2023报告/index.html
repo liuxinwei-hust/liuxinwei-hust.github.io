@@ -1,0 +1,917 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Liu XinWei">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="原文Octoverse: The state of open source and rise of AI in 2023 前言&emsp;&emsp;2023 年，GitHub 数据凸显了另一种技术如何迅速开始重塑开发者体验：人工智能。越来越多的开发人员开始使用人工智能，同时也尝试构建人工智能驱动的应用程序 三大趋势：  开发人员正在大量使用生成式人工智能进行构建，越来越多的开发人员尝试使用 Op">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Github 2023年开源状况和人工智能的崛起">
+<meta property="og:url" content="http://example.com/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/index.html">
+<meta property="og:site_name" content="AI&#39;s Time">
+<meta property="og:description" content="原文Octoverse: The state of open source and rise of AI in 2023 前言&emsp;&emsp;2023 年，GitHub 数据凸显了另一种技术如何迅速开始重塑开发者体验：人工智能。越来越多的开发人员开始使用人工智能，同时也尝试构建人工智能驱动的应用程序 三大趋势：  开发人员正在大量使用生成式人工智能进行构建，越来越多的开发人员尝试使用 Op">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/1.png">
+<meta property="og:image" content="http://example.com/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/2.png">
+<meta property="og:image" content="http://example.com/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/3.png">
+<meta property="og:image" content="http://example.com/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/4.png">
+<meta property="article:published_time" content="2024-04-08T11:45:17.000Z">
+<meta property="article:modified_time" content="2024-04-08T12:32:33.690Z">
+<meta property="article:author" content="Liu XinWei">
+<meta property="article:tag" content="Github">
+<meta property="article:tag" content="人工智能">
+<meta property="article:tag" content="AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/1.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Github 2023年开源状况和人工智能的崛起 - AI&#39;s Time</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Liu&#39;s个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于我</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/doc.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Github 2023年开源状况和人工智能的崛起"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-04-08 19:45" pubdate>
+          2024年4月8日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Github 2023年开源状况和人工智能的崛起</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h1><p><a target="_blank" rel="noopener" href="https://github.blog/2023-11-08-the-state-of-open-source-and-ai/?utm_source=banner&utm_medium=github&utm_campaign=octoverse">Octoverse: The state of open source and rise of AI in 2023</a></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>&emsp;&emsp;2023 年，GitHub 数据凸显了另一种技术如何迅速开始重塑开发者体验：人工智能。越来越多的开发人员开始使用人工智能，同时也尝试构建人工智能驱动的应用程序</p>
+<p>三大趋势：</p>
+<ul>
+<li>开发人员正在大量使用生成式人工智能进行构建，越来越多的开发人员尝试使用 OpenAI 和其他 AI的基础模型。根据开源生成式 AI 项目在 2023 年进入按贡献者数量计算的前 10 个最受欢迎的开源项目，几乎所有开发人员 (92%) 都在使用或试验借助 AI 编码工具。</li>
+<li>开发人员正在大规模运营云原生应用程序。使用基于 Git 的基础设施即代码 (IaC) 工作流程的声明性语言有所增加，云部署的标准化程度更高，开发人员使用 Dockerfile 和容器、IaC 和其他云原生的速度急剧增加。</li>
+<li>2023 年首次开源贡献者数量最多。商业支持的开源项目在首次贡献者和总体贡献中占据最大份额，但今年，生成式 AI 项目首次进入了贡献者最受欢迎的项目前 10。GitHub 上的私人项目显着增长，同比增长 38%，占 GitHub 上所有活动的 80% 以上。</li>
+</ul>
+<h1 id="开发者数量排名"><a href="#开发者数量排名" class="headerlink" title="开发者数量排名"></a>开发者数量排名</h1><p>&emsp;&emsp;美国拥有 2020 万开发者，过去一年开发者增长 21%，继续拥有全球最大的开发者社区。亚太地区、非洲、南美洲和欧洲的开发者社区逐年扩大，其中印度、巴西和日本处于领先地位。</p>
+<p><img src="/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/1.png" srcset="/img/loading.gif" lazyload alt="开发者TOP10"></p>
+<h2 id="GitHub预测未来五年排名前-10-的开发者社区"><a href="#GitHub预测未来五年排名前-10-的开发者社区" class="headerlink" title="GitHub预测未来五年排名前 10 的开发者社区"></a>GitHub预测未来五年排名前 10 的开发者社区</h2><p><img src="/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/2.png" srcset="/img/loading.gif" lazyload alt="开发者TOP10预测"></p>
+<h3 id="亚太地区同比增长最快的开发社区"><a href="#亚太地区同比增长最快的开发社区" class="headerlink" title="亚太地区同比增长最快的开发社区"></a>亚太地区同比增长最快的开发社区</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>开发人员数量</th>
+<th>同比增长</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01 新加坡</td>
+<td>&gt;100 万开发者</td>
+<td>39%</td>
+</tr>
+<tr>
+<td>02 印度</td>
+<td>&gt;1320 万开发者</td>
+<td>36%</td>
+</tr>
+<tr>
+<td>03 香港（特别行政区）</td>
+<td>&gt;160 万开发者</td>
+<td>35%</td>
+</tr>
+<tr>
+<td>04 越南</td>
+<td>&gt;150 万开发者</td>
+<td>34%</td>
+</tr>
+<tr>
+<td>05 印度尼西亚</td>
+<td>&gt;290 万开发者</td>
+<td>31%</td>
+</tr>
+<tr>
+<td>06 日本</td>
+<td>&gt;280 万开发者</td>
+<td>31%</td>
+</tr>
+<tr>
+<td>07 菲律宾</td>
+<td>&gt;130 万开发者</td>
+<td>31%</td>
+</tr>
+<tr>
+<td>08 泰国</td>
+<td>&gt;857K 开发者</td>
+<td>25%</td>
+</tr>
+<tr>
+<td>09 韩国</td>
+<td>&gt;190 万开发者</td>
+<td>22%</td>
+</tr>
+<tr>
+<td>10 澳大利亚</td>
+<td>&gt;140 万开发者</td>
+<td>21%</td>
+</tr>
+</tbody></table>
+<ul>
+<li>印度的开发者社区继续实现同比大幅增长。预计到 2027 年印度将取代美国成为 GitHub 上最大的开发者社区</li>
+<li>新加坡今年是亚太地区开发者人数增长最快的国家，并且以开发者占总人口的比例最高而位居全球第一。<br>新加坡国立大学计算机学院将 GitHub 纳入其课程，高增长也可能归因于该国在东南亚的监管重要性。</li>
+</ul>
+<h3 id="非洲地区同比增长最快的开发社区"><a href="#非洲地区同比增长最快的开发社区" class="headerlink" title="非洲地区同比增长最快的开发社区"></a>非洲地区同比增长最快的开发社区</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>开发人员数量</th>
+<th>同比增长</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01 尼日利亚</td>
+<td>&gt;86.8 万名开发者</td>
+<td>45%</td>
+</tr>
+<tr>
+<td>02 加纳</td>
+<td>&gt;152K 开发人员</td>
+<td>41%</td>
+</tr>
+<tr>
+<td>03 肯尼亚</td>
+<td>&gt;29.6 万名开发人员</td>
+<td>41%</td>
+</tr>
+<tr>
+<td>04 摩洛哥</td>
+<td>&gt;446K 开发人员</td>
+<td>35%</td>
+</tr>
+<tr>
+<td>05 埃塞俄比亚</td>
+<td>&gt;94K 开发人员</td>
+<td>32%</td>
+</tr>
+<tr>
+<td>06 南非</td>
+<td>&gt;539K 开发者</td>
+<td>30%</td>
+</tr>
+</tbody></table>
+<ul>
+<li>肯尼亚，小学和中学必须教授编程</li>
+</ul>
+<h3 id="南美洲地区同比增长最快的开发社区"><a href="#南美洲地区同比增长最快的开发社区" class="headerlink" title="南美洲地区同比增长最快的开发社区"></a>南美洲地区同比增长最快的开发社区</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>开发人员数量</th>
+<th>同比增长</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01 阿根廷</td>
+<td>&gt;925K 开发人员</td>
+<td>33%</td>
+</tr>
+<tr>
+<td>02 玻利维亚</td>
+<td>&gt;105K 开发人员</td>
+<td>33%</td>
+</tr>
+<tr>
+<td>03 哥伦比亚</td>
+<td>&gt;872K 开发者</td>
+<td>31%</td>
+</tr>
+<tr>
+<td>04 巴西</td>
+<td>&gt;430 万开发人员</td>
+<td>30%</td>
+</tr>
+<tr>
+<td>05 智利</td>
+<td>&gt;437K 开发人员</td>
+<td>26%</td>
+</tr>
+</tbody></table>
+<ul>
+<li>2023年，巴西的开发者人数是该地区最多的，并继续以两位数增长，同比增长30%</li>
+</ul>
+<h3 id="欧洲地区同比增长最快的开发社区"><a href="#欧洲地区同比增长最快的开发社区" class="headerlink" title="欧洲地区同比增长最快的开发社区"></a>欧洲地区同比增长最快的开发社区</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>开发人员数量</th>
+<th>同比增长</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01 西班牙</td>
+<td>&gt;150 万开发者</td>
+<td>25%</td>
+</tr>
+<tr>
+<td>02 葡萄牙</td>
+<td>&gt;41 万开发人员</td>
+<td>24%</td>
+</tr>
+<tr>
+<td>03 波兰</td>
+<td>&gt;120 万开发者</td>
+<td>24%</td>
+</tr>
+<tr>
+<td>04 德国</td>
+<td>&gt;290 万开发者</td>
+<td>22%</td>
+</tr>
+<tr>
+<td>05 意大利</td>
+<td>&gt;110 万开发者</td>
+<td>22%</td>
+</tr>
+<tr>
+<td>06 法国</td>
+<td>&gt;230 万开发者</td>
+<td>22%</td>
+</tr>
+<tr>
+<td>07 英国</td>
+<td>&gt;340 万开发人员</td>
+<td>21%</td>
+</tr>
+</tbody></table>
+<h1 id="2023-年生成式-AI-爆发式增长"><a href="#2023-年生成式-AI-爆发式增长" class="headerlink" title="2023 年生成式 AI 爆发式增长"></a>2023 年生成式 AI 爆发式增长</h1><p>虽然生成式人工智能在 2023 年引起了轰动，但对于 GitHub 上的开发者来说，它并不是全新的。事实上，过去几年我们已经在 GitHub 上看到了几个生成式 AI 项目的出现，以及许多其他专注于 AI 的项目。但 2023 年的 GitHub 数据反映了这些人工智能项目如何从更面向专业的工作和研究发展到更主流的采用，开发人员越来越多地使用预先训练的模型和 API 来构建由人工智能驱动的生成应用程序。<br>就在去年过半的时候，2023 年的生成式 AI 项目数量是 2022 年全年的两倍多，这只是冰山一角。</p>
+<ul>
+<li><p>开发人员越来越多地尝试人工智能模型。在过去的几年里，开发人员使用tensorflow&#x2F;tensorflow、pytorch&#x2F;pytorch等机器学习库构建项目，而现在更多的开发人员尝试使用AI模型和LLM（例如ChatGPT API）。</p>
+</li>
+<li><p>保持聪明：预计企业和组织也将利用预先训练的人工智能模型，特别是随着越来越多的开发人员熟悉如何使用它们进行构建。</p>
+</li>
+<li><p>开源人工智能创新多种多样，顶级人工智能项目由个人开发者拥有。分析 GitHub 上排名前 20 的开源生成式 AI 项目，其中一些顶级项目归个人所有。这表明 GitHub 上的开源项目继续推动创新，并向我们所有人展示行业的未来发展，社区围绕最令人兴奋的进步而构建。</p>
+</li>
+<li><p>生成式人工智能正在推动生成式人工智能项目的个人贡献者在全球范围内大幅增长，同比增长 148%，生成式人工智能项目总数也同比增长 248%。值得注意的是，美国、印度和日本在开发者社区中处于领先地位，其他地区（包括香港特别行政区）、英国和巴西紧随其后。</p>
+</li>
+</ul>
+<p><img src="/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/3.png" srcset="/img/loading.gif" lazyload alt="生成式人工智能项目"></p>
+<p>生成式人工智能会对开发者产生什么影响？</p>
+<p>今年早些时候，我们与哈佛商学院和 Keystone.AI 合作，围绕人工智能对开发者环境产生的经济和生产力影响进行了一些研究。我们发现的一项更引人注目的关键发现是，到 2030 年，开发人员将从生成式 AI 中受益的生产力提升预计可为全球经济贡献 1.5 万亿美元，并为全球新增 1500 万“有效开发人员” 。</p>
+<p>在过去的一年里，基于基础模型（例如 ChatGPT）构建的应用程序呈指数级增长，因为开发人员使用这些 LLM 来开发面向用户的工具，例如 API、机器人、助手、移动应用程序和插件。全球开发人员正在帮助为主流采用奠定基础，而实验正在帮助组织建立人才库。</p>
+<h1 id="最流行的编程语言"><a href="#最流行的编程语言" class="headerlink" title="最流行的编程语言"></a>最流行的编程语言</h1><p><img src="/2024/04/08/ai-git2023%E6%8A%A5%E5%91%8A/4.png" srcset="/img/loading.gif" lazyload alt="最流行的编程语言"></p>
+<p>JavaScript 再次夺得第一大最受欢迎语言的桂冠，并且我们继续看到 Python 和 Java 等熟悉的语言逐年保持在前五名语言之列。</p>
+<p>TypeScript 越来越受欢迎。今年，TypeScript 首次取代 Java，成为 GitHub 上 OSS 项目中第三大最受欢迎的语言，其用户群增长了 37%。 TypeScript 是一种集语言、类型检查器、编译器和语言服务于一体的语言，它于 2012 年推出，标志着渐进类型的到来，它允许开发人员在代码中采用不同级别的静态和动态类型。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>GitHub 是生成式 AI 的开发者平台。生成式 AI 将于 2023 年从专业领域发展成为主流技术，开源活动的爆炸式增长反映了这一点。随着越来越多的开发人员构建和试验生成式 AI，他们正在使用 GitHub 进行协作和集体学习。</li>
+<li>开发人员正在 GitHub 上大规模运行云原生应用程序。 2019 年，我们开始看到开源中使用基于容器的技术的开发人员数量大幅增加，并且越来越多的开发人员使用基于 Git 的 IaC 工作流程、容器编排和其他云原生技术的速度急剧增加2023 年。如此大量的活动表明开发人员正在使用 GitHub 来标准化他们将软件部署到云的方式。</li>
+<li>GitHub 是开源社区、开发人员和公司构建软件的地方。 2023 年，私有存储库的数量增加了 38%，占 GitHub 上所有活动的 81% 以上。但开源社区持续增长，他们使用 GitHub 来构建未来并推动行业向前发展。数据显示新的开源开发人员的增加以及开放社区可能实现的快速创新步伐，很明显开源从未如此强大。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/AI/" class="category-chain-item">AI</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Github/" class="print-no-link">#Github</a>
+      
+        <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" class="print-no-link">#人工智能</a>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Github 2023年开源状况和人工智能的崛起</div>
+      <div>http://example.com/2024/04/08/ai-git2023报告/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Liu XinWei</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年4月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/04/03/%E6%95%B0%E6%8D%AE%E5%8A%A0%E5%AF%86%E6%B1%87%E6%80%BB/" title="数据加密汇总">
+                        <span class="hidden-mobile">数据加密汇总</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'liuxinwei-hust/comment-utterance');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
